@@ -276,7 +276,78 @@ fn basics3() {
     else{
         // else can also be added which again equals to above match
     }
+    /* 
+    A package can contain multiple binary crates and optionally 1 library crate
+    rust uses module system which has tools to organize code
+    Packages: A Cargo feature that lets you build, test, and share crates
+    Crates: A tree of modules that produces a library or executable
+    Modules and use: Let you control the organization, scope, and privacy of paths
+    Paths: A way of naming an item, such as a struct, function, or module
+    crate root file, package must contain atlease 1 create binary or library
+    cargo is a package with multiple creates - main.res, lib.rs 
+    or multiple binary crates in src/bin folder
+    compiler looks for modules, submodules in inline, src/name.rs, src/name/mod.rs
+    submodules = create:garden:vegetables.rs where garden is parent mod with src/garden.rs file
+    Path: create::garden::vegetables::Tomato
+    modules are private by default, to make public use pub mod, pub
+    use creates shortcuts within a scope
+    use create::garden::vegetables::Tomato now Tomato can be directly used
+    use crate::garden::vegetables::Asparagus;
+
+    pub mod garden;
     
+    fn main() {
+        let plant = Asparagus {};
+        println!("I'm growing {:?}!", plant);
+    }
+    cargo new restuarent --lib // library create
+    cargo new restuarent // binary create
+    contents of main.res and lib.rs form create roots so mod starts with create
+    for external create Path starts with its name
+    absolute and relative path i.e, self, super
+    parent mod cant use child private items but child can use parent items
+    make mod pub and also its items pub to be accessed by others
+    generally write sharable code in library crates
+    structs are private and all its members too and to make them public struct and each items should be made pub
+    making enums public makes all its members public
+    use keyword to bring modules into scope
+    mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+use crate::front_of_house::hosting;
+
+mod customer {
+    pub fn eat_at_restaurant() {
+        hosting::add_to_waitlist();
+    }
+}
+    move the use into customer mod  or use super to fix it
+    Idomatic use Paths
+    as for aliasing
+    use std::io::Result as IoResult;
+    reexporting using pub use
+    crate or library name at start of absolute path
+    mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+
+pub use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+}
+    now restaurent::hosting::add_to_waithlist() is also valid
+    nested paths use std::{cmp::Ordering, io} instead of  2 use lines
+    use std::io::{self, Write};
+    glob operator * 
+    use std::collections::*; bring all public items in
+    splitting mods into multiple files
+    */
 }
 
 #[derive(Debug)]
