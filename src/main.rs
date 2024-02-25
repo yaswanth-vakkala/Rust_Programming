@@ -1,6 +1,6 @@
 use rand::Rng;
 use std::{cmp::Ordering, io, string};
-
+// many libraries get imported by defualt with prelude
 fn main() {
     println!("Guess the number!");
 
@@ -33,6 +33,7 @@ fn main() {
     }
     basics1(); // basics1() also valid
     basics2();
+    basics3();
 }
 
 fn basics1(){
@@ -143,6 +144,165 @@ fn basics2(){
     // but slicing should happen at valid utf8 boundary
     // &str - string literals are slices
 
+}
+
+fn basics3() {
+    struct User {
+        active : bool,
+        username: String,
+        email: String,
+        sign_in_count : u64
+    }
+    // &str wont work but only String refer to lifetimes later
+    let mut user1 = User {
+        active: true,
+        username: String::from("someusername123"),
+        email: String::from("someone@example.com"),
+        sign_in_count: 1,
+    };
+    user1.email = String::from("anotheremail@example.com");
+    // fn build_user(email: String, username: String) -> User {
+    //     User {
+    //         active: true,
+    //         username,
+    //         email,
+    //         sign_in_count: 1,
+    //     }
+    // }
+    // user 1 will be no longer valid, but if email, username given new strings then user 1 valid
+    // let user2 = User {
+    //     email: String::from("another@example.com"),
+    //     ..user1
+    // };
+    // tuple struct
+    struct Color(i32, i32, i32);
+    let black = Color(0,0,0);
+    // unit like struct
+    struct AlwaysEqual;
+    let subject = AlwaysEqual;
+    /*  ex of struct - take rect class with area func both width, height are unrelated
+    we can take a struct but syntax of .0, .1 is weird and expressive
+    using structs we can convey meanning and have them related
+    */
+    let rect1 = Rectangle {
+        width: 30,
+        height: 50,
+    };
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        rect1.area()
+    );
+    // struct wont implement Display, but can Debug trait
+    println!("rect1 is {:?}", rect1); // {:#?} also valid
+    // this takes ownership of expression and prints to stderr not stdout
+    dbg!(&rect1);
+    // rust automatically referencing and dereferencing
+    // p1.distance(&p2) = (&p1).distance(&p2)
+    // :: is valid for namespaces created by modules and associated funcs 
+    let sq = Rectangle::square(3);
+    // instead of using enum inside struct we can do this
+    enum IpAddr {
+        V4(u8, u8, u8, u8),
+        V6(String),
+    }
+    // or put structs inside enum as rust std does
+    // any enum type can be passed into the below func
+    // fn route(ip_kind: IpAddrKind) {}
+    // route(IPAddrKind::V4);
+    let home = IpAddr::V4(127, 0, 0, 1);
+    let loopback = IpAddr::V6(String::from("::1"));
+    enum Message {
+        Quit,
+        Move { x: i32, y: i32 },
+        Write(String),
+        ChangeColor(i32, i32, i32),
+    }
+    impl Message {
+        fn call(&self) {
+            // method body would be defined here
+        }
+    }
+    let m = Message::Write(String::from("hello"));
+    m.call();
+    // rust doesnt have null but Option enum
+    // we seen Result enum which handles errors
+    // enum Option<T> {
+    //     None,
+    //     Some(T),
+    // }
+    let some_char = Some('e');
+    let absent_number: Option<i32> = None;
+    // it handles none as we are required to explicitly handle it and to use it convert it into T
+    enum Coin {
+        Penny,
+        Nickel,
+        Dime,
+        Quarter,
+    }
+    fn value_in_cents(coin: Coin) -> u8 {
+        match coin {
+            Coin::Penny => {
+                println!("Lucky penny!");
+                1
+            }
+            Coin::Nickel => 5,
+            Coin::Dime => 10,
+            Coin::Quarter => 25,
+        }
+    }
+    fn plus_one(x: Option<i32>) -> Option<i32> {
+        match x { // matches are exhaustive so all cases need to be handled in enum
+            None => None,
+            Some(i) => Some(i + 1),
+        }
+    }
+    // let dice_roll = 9;
+    // match dice_roll {
+    //     3 => add_fancy_hat(),
+    //     7 => remove_fancy_hat(),
+    //     other => move_player(other),
+    //     _ => () //  _ = this same as above but doen't bind to value so unused var warning
+    // }
+    let config_max = Some(3u8);
+    match config_max {
+        Some(max) => println!("The maximum is configured to be {}", max),
+        _ => (),
+    }
+    // to
+    let config_max = Some(3u8);
+    if let Some(max) = config_max {
+        println!("The maximum is configured to be {}", max);
+    }
+    else{
+        // else can also be added which again equals to above match
+    }
+    
+}
+
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+// multiple impl blocs are allowed
+impl Rectangle {
+    // self : &Self = &Rectangle - self shorthand below
+    // can have same name as fields
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.height
+    }
+    // assosiated funcs which dont have self as 1st parameter used for constructors usually
+    fn square(size: u32) -> Self {
+        Self {
+            width: size,
+            height: size,
+        }
+    }
 }
 
 fn calculate_length(s: &String) -> usize {
